@@ -4,40 +4,22 @@ using UnityEngine;
 
 [RequireComponent (typeof (BoxCollider2D))]
 
-public class Controller2D : MonoBehaviour
+public class Controller2D : RaycastController
 {
 
-    public LayerMask collisionMask;
-
-    //how deep the rays overlap with the player model
-    const float skinWidth = .015f;
-
-    //how many rays we'll use
-    public int horizontalRayCount = 4;
-    public int verticalRayCount = 4;
 
     //maximum angle that allows the player to climb
     float maxClimbAngle = 80;
     float maxDescendAngle = 75;
 
-    //distance of each ray
-    float horitalRaySpacing;
-    float verticalRaySpacing;
-
-    //object get components
-    BoxCollider2D collider;
-    RaycastOrigins raycastOrigins;
     public CollisionInfo collisions;
 
-    void Start()
-    {
-        //initialize everything
-        collider = GetComponent<BoxCollider2D>();
-        CalculateRaySpacing ();
+    public override void Start(){
+        base.Start ();
     }
 
     //this function is for moving the player (is called by player)
-    public void Move(Vector3 velocity)
+    public void Move(Vector3 velocity, bool standingOnPlatform = false)
     {     
         //whenever we move we update the rays and reset collisions
         UpdateRaycastOrigins();
@@ -58,6 +40,9 @@ public class Controller2D : MonoBehaviour
         }
         //afterwards translate
         transform.Translate (velocity);
+        if (standingOnPlatform){
+            collisions.below = true;
+        }
     }
 
     //horizontal collisions function
@@ -83,6 +68,10 @@ public class Controller2D : MonoBehaviour
             Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
             if(hit)
             {
+                //if the distance is 0 use the next ray to determine collisions
+                if (hit.distance == 0){
+                    continue;
+                }
                 //the angle of the slope is the same as the normal and the angle the slope is facing
                 float slopeAngle = Vector2.Angle(hit.normal,Vector2.up);
                 //after calculating the slope angle 
@@ -220,41 +209,6 @@ public class Controller2D : MonoBehaviour
                 }
             }
         }
-    }
-
-    void UpdateRaycastOrigins()
-    {
-        //get bounds from Bounds from collider
-        Bounds bounds = collider.bounds;
-        bounds.Expand (skinWidth * -2);
-
-        //set raycast origins by getting bounds min and max values
-        raycastOrigins.bottomLeft = new Vector2(bounds.min.x, bounds.min.y);
-        raycastOrigins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);
-        raycastOrigins.topLeft = new Vector2(bounds.min.x, bounds.max.y);
-        raycastOrigins.topRight = new Vector2(bounds.max.x, bounds.max.y);
-    }
-
-    void CalculateRaySpacing()
-    {
-        //get bounds from Bounds from collider
-        Bounds bounds = collider.bounds;
-        bounds.Expand (skinWidth * -2);
-
-        //distance is calculated by checking how many rays there are
-        //example 2 rays means one in each corner (we need at least 2)
-        horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);
-        verticalRayCount = Mathf.Clamp(verticalRayCount, 2, int.MaxValue);
-
-        //we calculate the space by dividing the bounds size by the number of rays - 1
-        horitalRaySpacing = bounds.size.y / (horizontalRayCount-1);
-        verticalRaySpacing = bounds.size.x / (verticalRayCount-1);
-    }
-
-    //store the corners of our player
-    struct RaycastOrigins{
-        public Vector2 topLeft, topRight; 
-        public Vector2 bottomLeft, bottomRight;
     }
 
     public struct CollisionInfo
