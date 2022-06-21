@@ -27,6 +27,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        //initalize and calculate gravity and jump velocity
         controller = GetComponent<Controller2D>();
 
         gravity = -(2 * jumpHeight/Mathf.Pow(timeToJumpApex,2));
@@ -51,7 +52,7 @@ public class Player : MonoBehaviour
         }
 
        
-       
+        //calculate the velocity and gravity using if it's grounded and gravity calculations
         float targetVelocityX = input.x * moveSpeed;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below?accelerationTimeGrounded:accelerationTimeAirborne));
         velocity.y += gravity * Time.deltaTime;
