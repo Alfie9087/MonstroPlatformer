@@ -7,10 +7,11 @@ using UnityEngine;
 
 public class RaycastController : MonoBehaviour
 {
+    //mask what collides with raycast
     public LayerMask collisionMask;
 
     //how deep the rays overlap with the player model
-    public const float skinWidth = .015f;
+    public const float skinWidth = 0.1f;
 
     //distance of each ray
     [HideInInspector]
