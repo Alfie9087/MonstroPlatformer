@@ -13,20 +13,25 @@ public class Controller2D : RaycastController
     float maxDescendAngle = 75;
 
     public CollisionInfo collisions;
+    Vector2 playerInput;
 
     public override void Start(){
         base.Start ();
         collisions.faceDir = 1;
     }
+    public void Move(Vector3 velocity, bool standingOnPlatform){
+        Move(velocity,Vector2.zero, standingOnPlatform); 
+    }
 
     //this function is for moving the player (is called by player)
-    public void Move(Vector3 velocity, bool standingOnPlatform = false)
+    public void Move(Vector3 velocity, Vector2 input, bool standingOnPlatform = false)
     {     
         //whenever we move we update the rays and reset collisions
         UpdateRaycastOrigins();
         collisions.Reset();
 
         collisions.velocityOld = velocity;
+        playerInput = input;
 
         if (velocity.x != 0){
             collisions.faceDir = (int)Mathf.Sign(velocity.x);
@@ -106,8 +111,10 @@ public class Controller2D : RaycastController
                 if(!collisions.climbingSlope || slopeAngle > maxClimbAngle){
 
                     //change velocity and ray length if colliding
-                    velocity.x = (hit.distance - skinWidth) * directionX;
-                    rayLength = hit.distance;
+                    //velocity.x = (hit.distance - skinWidth) * directionX;
+                    //rayLength = hit.distance;
+                    velocity.x = Mathf.Min(Mathf.Abs(velocity.x), (hit.distance - skinWidth)) * directionX;
+                    rayLength = Mathf.Min(Mathf.Abs(velocity.x) + skinWidth, hit.distance);
 
                     if (collisions.climbingSlope){
                         velocity.y = Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
@@ -140,6 +147,20 @@ public class Controller2D : RaycastController
 
             if(hit)
             {
+                if (hit.collider.tag == "Through"){
+                    if(directionY == 1 || hit.distance == 0){
+                        continue;
+                    }
+                }
+                if (collisions.fallingThroughPlatform){
+                    continue;
+                }
+                if (playerInput.y == -1){
+                    collisions.fallingThroughPlatform = true;
+                    Invoke("ResetFallingThroughPlatform", 0.4f);
+                    continue;
+                }
+
                 //change velocity and ray length if colliding
                 velocity.y = (hit.distance - skinWidth) * directionY;
                 rayLength = hit.distance;
@@ -172,7 +193,9 @@ public class Controller2D : RaycastController
 
         }
     }
-
+    void ResetFallingThroughPlatform(){
+        collisions.fallingThroughPlatform = false;
+    }
     void ClimbSlope(ref Vector3 velocity, float slopeAngle)
     {
         //basically we calculate how high we go using sin and the angle
@@ -227,6 +250,7 @@ public class Controller2D : RaycastController
         public bool climbingSlope, descendingSlope;
         public float slopeAngle, slopeAngleOld;
         public Vector3 velocityOld;
+        public bool fallingThroughPlatform;
 
         public int faceDir;
         public void Reset(){

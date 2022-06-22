@@ -116,7 +116,7 @@ public class PlatformerController : RaycastController
 
                 RaycastHit2D hit = Physics2D.Raycast(rayOrigin,Vector2.up*directionY,rayLength,passengersMask);
 
-                if (hit)
+                if (hit && hit.distance != 0)
                 {
                     if (!movedPassengers.Contains(hit.transform)){
                         movedPassengers.Add(hit.transform);
@@ -145,7 +145,7 @@ public class PlatformerController : RaycastController
 
             //calculate if it hit something (origin,direction, length of the ray, mask (this is the layer))
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin,Vector2.right*directionX,rayLength,passengersMask);
-            if (hit)
+            if (hit && hit.distance != 0)
                 {
                     if (!movedPassengers.Contains(hit.transform)){
                         movedPassengers.Add(hit.transform);
@@ -168,7 +168,7 @@ public class PlatformerController : RaycastController
 
                 RaycastHit2D hit = Physics2D.Raycast(rayOrigin,Vector2.up,rayLength,passengersMask);
 
-                if (hit)
+                if (hit && hit.distance != 0)
                 {
                     if (!movedPassengers.Contains(hit.transform)){
                         movedPassengers.Add(hit.transform);
