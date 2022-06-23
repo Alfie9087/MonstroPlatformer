@@ -13,6 +13,8 @@ public class RaycastController : MonoBehaviour
     //how deep the rays overlap with the player model
     public const float skinWidth = 0.1f;
 
+    public const float dstBetweenRays = 0.25f;
+
     //distance of each ray
     [HideInInspector]
     public float horitalRaySpacing;
@@ -57,6 +59,12 @@ public class RaycastController : MonoBehaviour
         //get bounds from Bounds from collider
         Bounds bounds = collider.bounds;
         bounds.Expand (skinWidth * -2);
+
+        float boundsWidth = bounds.size.x;
+        float boundsHeight = bounds.size.y;
+
+        horizontalRayCount = Mathf.RoundToInt(boundsHeight/dstBetweenRays);
+        verticalRayCount = Mathf.RoundToInt(boundsWidth/dstBetweenRays);
 
         //distance is calculated by checking how many rays there are
         //example 2 rays means one in each corner (we need at least 2)
