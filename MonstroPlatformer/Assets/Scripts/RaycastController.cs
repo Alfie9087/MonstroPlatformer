@@ -29,10 +29,13 @@ public class RaycastController : MonoBehaviour
     public int verticalRayCount = 4;
     
     //public virtual void means it will call even if we use another start in controller 2d
-    public virtual void Start()
+    public virtual void Awake()
     {
         //initialize everything
         collider = GetComponent<BoxCollider2D>();
+
+    }
+    public virtual void Start(){
         CalculateRaySpacing ();
     }
 
