@@ -13,7 +13,7 @@ public class RaycastController : MonoBehaviour
     //how deep the rays overlap with the player model
     public const float skinWidth = 0.1f;
 
-    public const float dstBetweenRays = 0.25f;
+    public const float dstBetweenRays = 0.20f;
 
     //distance of each ray
     [HideInInspector]
