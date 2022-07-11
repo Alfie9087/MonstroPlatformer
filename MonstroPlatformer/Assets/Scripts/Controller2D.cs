@@ -293,12 +293,12 @@ public class Controller2D : RaycastController
 
 
         }
-        if (collisions.shapeCast){
-            print("yes");
-        }
-        else {
-            print("no");
-        }
+        // if (collisions.shapeCast){
+        //     print("yes");
+        // }
+        // else {
+        //     print("no");
+        // }
 
     }
 

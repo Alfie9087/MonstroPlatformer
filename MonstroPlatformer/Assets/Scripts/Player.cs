@@ -38,6 +38,10 @@ public class Player : MonoBehaviour
 
     public Animator animator;
 
+    float oldVelocityDir;
+    float elapsedMovement = 0;
+    public AnimationCurve curve;
+
 
     // Start is called before the first frame update
     Controller2D controller;
@@ -159,10 +163,62 @@ public class Player : MonoBehaviour
         }
     }
 
+    float oldvelocity = 0;
+    bool accelerating = false;
+    bool decelerating = false;
+    bool breaking = false;
+
     void CalculateVelocity(){
+
+
+        elapsedMovement++;
+        if (Mathf.Sign(oldVelocityDir) == directionalInput.x){
+            accelerating = true;
+
+            if (decelerating || breaking){
+                elapsedMovement = 0;
+                decelerating = false;
+                breaking = false;
+            }
+            velocity.x = (Mathf.Lerp(0, moveSpeed, curve.Evaluate(elapsedMovement/100)))  * directionalInput.x;
+            print("accelerating");
+            oldvelocity = velocity.x;
+        }
+        if (-Mathf.Sign(oldVelocityDir) == (directionalInput.x)){
+            velocity.x = 0;
+        }
+        if (directionalInput.x == 0){
+            if (accelerating || breaking){
+                elapsedMovement = 0;
+                accelerating = false;
+                breaking = false;
+            }
+            decelerating = true;
+           velocity.x = (Mathf.Lerp(oldvelocity* Mathf.Sign(oldvelocity), 0, curve.Evaluate(elapsedMovement/700)))  * Mathf.Sign(oldvelocity);
+            oldvelocity = velocity.x;
+        }
+        // print(elapsedMovement);
+
+
+        
+        
+        
+        oldVelocityDir = directionalInput.x;
+        // if (Mathf.Sign(oldVelocityDir) == directionalInput.x){
+        // velocity.x = (Mathf.Lerp(0, moveSpeed, curve.Evaluate(elapsedMovement/100)))  * directionalInput.x;
+        // }
+        // else{
+        //  velocity.x = (Mathf.Lerp(oldvelocity, 0, curve.Evaluate(elapsedMovement/100)))  * directionalInput.x;
+        // }
+
+        
+        // print(velocity.x);
+        //print(velocity.x);
+        
+
          //calculate the velocity and gravity using if it's grounded and gravity calculations
-        float targetVelocityX = directionalInput.x * moveSpeed;
-        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below?accelerationTimeGrounded:accelerationTimeAirborne));
+        // float targetVelocityX = directionalInput.x * moveSpeed;
+        //velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below?accelerationTimeGrounded:accelerationTimeAirborne));
         velocity.y += gravity * Time.deltaTime;
     }
 }
